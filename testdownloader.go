@@ -51,4 +51,25 @@ func main() {
 	}
 
 	log.Print("Found file ", fileData.Path, " with size ", fileData.Size, " and hash ", fileData.Hash)
+
+	reader, err := vidispine.NewVSFileReader(&comm, storageId, fileId) //default to 2Mb block size
+	if err != nil {
+		log.Fatal("Could not set up file reader: ", err.Error())
+	}
+
+	fp, openErr := os.Create(output)
+	if openErr != nil {
+		log.Fatal("Could not open output file '", output, "' ", openErr.Error())
+	}
+
+	defer fp.Close()
+	log.Print("Copying data into ", output, "....\n")
+
+	_, copyErr := vidispine.BufferedCopy(fp, reader, 40*1024*1024)
+
+	if copyErr != nil {
+		log.Fatal("Could not copy data: ", copyErr.Error())
+	}
+
+	log.Print("All done!")
 }

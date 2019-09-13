@@ -42,6 +42,10 @@ func handleResponse(response *http.Response) (*http.Response, error) {
 	switch response.StatusCode {
 	case 200:
 		return response, nil
+	case 201: //empty body
+		return response, nil
+	case 206: //partial content
+		return response, nil
 	case 400:
 		body, readErr := readBody(response)
 		if readErr != nil {
@@ -141,8 +145,13 @@ func (comm *VidispineCommunicator) MakeRequest(verb string, subpath string, matr
 		return nil, vsErr
 	}
 
-	rtnContent, readErr := readBody(response)
-	return rtnContent, readErr
+	if response.StatusCode == 201 {
+		//empty body
+		return make([]byte, 0), nil
+	} else {
+		rtnContent, readErr := readBody(response)
+		return rtnContent, readErr
+	}
 }
 
 func (comm *VidispineCommunicator) MakeRequestRaw(verb string, subpath string, matrixParams map[string]string, queryParams map[string]string, headers map[string]string, body io.Reader) (*http.Response, error) {
