@@ -40,14 +40,8 @@ func VSFileInfo(communicator *VidispineCommunicator, storageId string, fileId st
 /**
 create a new VSFileReader for the given storageId and fileId
 */
-func NewVSFileReader(communicator *VidispineCommunicator, storageId string, fileId string) (*VSFileReader, error) {
-	fileData, vsErr := VSFileInfo(communicator, storageId, fileId)
-
-	if vsErr != nil {
-		return nil, vsErr
-	}
-
-	rtn := VSFileReader{storageId, fileId, 0, fileData, communicator}
+func NewVSFileReader(communicator *VidispineCommunicator, fileData *VSFileDocument) (*VSFileReader, error) {
+	rtn := VSFileReader{fileData.StorageId, fileData.Id, 0, fileData, communicator}
 	return &rtn, nil
 }
 
