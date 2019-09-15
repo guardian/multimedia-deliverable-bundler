@@ -18,6 +18,7 @@ type VidispineCommunicator struct {
 	Port     int16
 	User     string
 	Password string
+	Token    string
 }
 
 /**
@@ -164,7 +165,13 @@ func (comm *VidispineCommunicator) MakeRequestRaw(verb string, subpath string, m
 	if err != nil {
 		return nil, err
 	}
-	req.SetBasicAuth(comm.User, comm.Password)
+
+	if comm.Token == "" {
+		req.SetBasicAuth(comm.User, comm.Password)
+	} else {
+		req.Header.Set("Authorization", fmt.Sprintf("token %s", comm.Token))
+	}
+
 	req.Host = comm.Hostname
 
 	for k, v := range headers {

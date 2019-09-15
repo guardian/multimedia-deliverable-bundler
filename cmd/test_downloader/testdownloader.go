@@ -1,4 +1,4 @@
-package test_downloader
+package main
 
 import (
 	"flag"
@@ -42,7 +42,14 @@ func main() {
 		log.Fatal("Could not open ", passfile, ": ", readErr)
 	}
 
-	comm := vidispine.VidispineCommunicator{proto, server, int16(port), user, string(passwdContent)}
+	comm := vidispine.VidispineCommunicator{
+		Protocol: proto,
+		Hostname: server,
+		Port:     int16(port),
+		User:     user,
+		Password: string(passwdContent),
+		Token:    "",
+	}
 
 	fileData, vsLookupErr := vidispine.VSFileInfo(&comm, storageId, fileId)
 
@@ -52,7 +59,7 @@ func main() {
 
 	log.Print("Found file ", fileData.Path, " with size ", fileData.Size, " and hash ", fileData.Hash)
 
-	reader, err := vidispine.NewVSFileReader(&comm, storageId, fileId) //default to 2Mb block size
+	reader, err := vidispine.NewVSFileReader(&comm, fileData) //default to 2Mb block size
 	if err != nil {
 		log.Fatal("Could not set up file reader: ", err.Error())
 	}
